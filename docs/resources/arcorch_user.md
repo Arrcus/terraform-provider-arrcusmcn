@@ -1,11 +1,11 @@
-# <resource name> arcorch_user
+# <resource name> arrcusmcn_user
 
-The arcorch_user resource is for the use of creation and management of Arrcus MCN accounts.
+The arrcusmcn_user resource is for the use of creation and management of Arrcus MCN accounts.
 
 ## Example Usage
 
 ```hcl
-resource "arcorch_user" "user" {
+resource "arrcusmcn_user" "user" {
   username = "username"
   password = "password"
   email = "username@email.com"

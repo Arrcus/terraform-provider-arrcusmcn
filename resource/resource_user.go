@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/Arrcus/terraform-provider-arcorch/models"
-	schemas "github.com/Arrcus/terraform-provider-arcorch/schemas"
-	"github.com/Arrcus/terraform-provider-arcorch/utils"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/models"
+	schemas "github.com/Arrcus/terraform-provider-arrcusmcn/schemas"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/utils"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"

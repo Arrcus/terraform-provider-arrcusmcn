@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"github.com/Arrcus/terraform-provider-arcorch/models"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 

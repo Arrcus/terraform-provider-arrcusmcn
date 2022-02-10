@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/Arrcus/terraform-provider-arcorch/datasource"
-	dc "github.com/Arrcus/terraform-provider-arcorch/datasource/credential"
-	dd "github.com/Arrcus/terraform-provider-arcorch/datasource/deployment"
-	"github.com/Arrcus/terraform-provider-arcorch/resource"
-	rc "github.com/Arrcus/terraform-provider-arcorch/resource/credential"
-	rd "github.com/Arrcus/terraform-provider-arcorch/resource/deployment"
-	"github.com/Arrcus/terraform-provider-arcorch/utils"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/datasource"
+	dc "github.com/Arrcus/terraform-provider-arrcusmcn/datasource/credential"
+	dd "github.com/Arrcus/terraform-provider-arrcusmcn/datasource/deployment"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/resource"
+	rc "github.com/Arrcus/terraform-provider-arrcusmcn/resource/credential"
+	rd "github.com/Arrcus/terraform-provider-arrcusmcn/resource/deployment"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -40,14 +40,14 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"arcorch_aws_deployment": rd.ResourceAwsDeployment(),
-			"arcorch_aws_cred":       rc.ResourceAwsCredential(),
-			"arcorch_user":           resource.ResourceUser(),
+			"arrcusmcn_aws_deployment": rd.ResourceAwsDeployment(),
+			"arrcusmcn_aws_cred":       rc.ResourceAwsCredential(),
+			"arrcusmcn_user":           resource.ResourceUser(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"arcorch_user":           datasource.DataSourceUser(),
-			"arcorch_aws_cred":       dc.DataSourceAwsCred(),
-			"arcorch_aws_deployment": dd.DataSourceAwsDeployment(),
+			"arrcusmcn_user":           datasource.DataSourceUser(),
+			"arrcusmcn_aws_cred":       dc.DataSourceAwsCred(),
+			"arrcusmcn_aws_deployment": dd.DataSourceAwsDeployment(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

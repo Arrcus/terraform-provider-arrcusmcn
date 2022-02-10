@@ -3,8 +3,8 @@ package schemas
 import (
 	"errors"
 
-	"github.com/Arrcus/terraform-provider-arcorch/models"
-	"github.com/Arrcus/terraform-provider-arcorch/utils"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/models"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
