@@ -1,0 +1,2584 @@
+---
+swagger: "2.0"
+info:
+  description: Arrcus Orchestrator
+  title: Arc Orch
+  version: 1.0.0
+consumes: [application/json]
+produces: [application/json]
+schemes:
+  - http
+basePath: /api
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+paths:
+  /get_user_info:
+    get:
+      tags: [users]
+      operationId: getUserInfo
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: get a single use info based on the JWT token
+          schema:
+            $ref: '#/definitions/user'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /login:
+    post:
+      description: 'Returns token for authorized User'
+      tags: [user]
+      operationId: Login
+      consumes:
+        - "application/json"
+      parameters:
+        - name: 'login'
+          in: 'body'
+          required: true
+          description: 'Login Payload'
+          schema:
+            $ref: '#/definitions/login_request'
+      responses:
+        200:
+          description: Successful login
+          schema:
+            $ref: '#/definitions/login_response'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /register:
+    post:
+      description: 'To register a new user'
+      tags: [user]
+      operationId: register
+      consumes:
+        - 'application/json'
+      parameters:
+        - name: user
+          in: body
+          required: true
+          description: 'Registration payload'
+          schema:
+            $ref: '#/definitions/user'
+      responses:
+        200:
+          description: Successful registration
+          schema:
+            $ref: '#/definitions/success_response'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /users/:
+    get:
+      tags: [users]
+      operationId: listUsers
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list the all the users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/user'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /users/{id}:
+    put:
+      tags: [users]
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: user
+          in: body
+          schema:
+            $ref: "#/definitions/user"
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/user"
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    get:
+      tags: [users]
+      operationId: describeUsers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/user"
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    delete:
+      tags: [users]
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        204:
+          description: Deleted
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /certificates:
+    get:
+      tags: [certificates]
+      operationId: listCertificates
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 1
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: List the certificates
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/certificates'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+    post:
+      tags: [certificates]
+      operationId: createCertificates
+      parameters:
+        - name: certificates
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/certificates'
+      security:
+        - Bearer: []
+      responses:
+        201:
+          description: Create a new certificate
+          schema:
+            $ref: '#/definitions/certificates'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /certificates/{id}:
+    put:
+      tags: [certificates]
+      operationId: updateCertificates
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: certificates
+          in: body
+          schema:
+            $ref: '#/definitions/certificates'
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/certificates'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    get:
+      tags: [certificates]
+      operationId: describeCertificates
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Describe a single certificate
+          schema:
+            $ref: '#/definitions/certificates'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    delete:
+      tags: [certificates]
+      operationId: deleteCertificates
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        204:
+          description: Deleted certificate
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /dns/aws:
+    get:
+      tags: [dns]
+      operationId: listDnsAws
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 1
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: List the Domain Names
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/dns'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /dns/aws/arecord:
+    get:
+      tags: [dns]
+      operationId: listARecords
+      parameters:
+        - name: HostedZoneID
+          in: query
+          type: string
+          required: true
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 1
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: List the Domain Names
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/arecord'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /dns:
+    get:
+      tags: [dns]
+      operationId: listDns
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 1
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: List the Domain Names
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/dns'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+    post:
+      tags: [dns]
+      operationId: createDns
+      parameters:
+        - name: dns
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/dns'
+      security:
+        - Bearer: []
+      responses:
+        201:
+          description: Create a new DNS
+          schema:
+            $ref: '#/definitions/dns'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /dns/{id}:
+    put:
+      tags: [dns]
+      operationId: updateDns
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: dns
+          in: body
+          schema:
+            $ref: '#/definitions/dns'
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/dns'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    get:
+      tags: [dns]
+      operationId: describeDns
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Describe a single DNS
+          schema:
+            $ref: '#/definitions/dns'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    delete:
+      tags: [dns]
+      operationId: deleteDns
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        204:
+          description: Deleted DNS
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /arcedge_credentials:
+    get:
+      tags: [arcedgecredentials]
+      operationId: listArcEdgeCredentials
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 1
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: List the ArcEdge Credentials
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/arcedgecredentials'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+    post:
+      tags: [arcedgecredentials]
+      operationId: createArcEdgeCredentials
+      parameters:
+        - name: arcedgecredentials
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/arcedgecredentials'
+      security:
+        - Bearer: []
+      responses:
+        201:
+          description: Create a new ArcEdge Credential
+          schema:
+            $ref: '#/definitions/arcedgecredentials'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /arcedge_credentials/{id}:
+    put:
+      tags: [arcedgecredentials]
+      operationId: updateArcEdgeCredentials
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: arcedgecredentials
+          in: body
+          schema:
+            $ref: '#/definitions/arcedgecredentials'
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/arcedgecredentials'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    get:
+      tags: [arcedgecredentials]
+      operationId: describeArcEdgeCredentials
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Describe a single ArcEdge Credential
+          schema:
+            $ref: '#/definitions/arcedgecredentials'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    delete:
+      tags: [arcedgecredentials]
+      operationId: deleteArcEdgeCredentials
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        204:
+          description: Deleted credential
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /connections:
+    get:
+      tags: [connections]
+      operationId: listConnections
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list the connections
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/connections'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+    post:
+      tags: [connections]
+      operationId: createConnections
+      parameters:
+        - name: connections
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/connections'
+      security:
+        - Bearer: []
+      responses:
+        201:
+          description: Create a new connection
+          schema:
+            $ref: '#/definitions/connections'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /connections/{id}:
+    put:
+      tags: [connections]
+      operationId: updateConnections
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: connections
+          in: body
+          schema:
+            $ref: '#/definitions/connections'
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/connections'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    get:
+      tags: [connections]
+      operationId: describeConnections
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Describe a single connection
+          schema:
+            $ref: '#/definitions/connections'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    delete:
+      tags: [connections]
+      operationId: deleteConnections
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        204:
+          description: Deleted connection
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials:
+    get:
+      tags: [credentials]
+      operationId: listCredentials
+      parameters:
+        - name: provider
+          in: query
+          type: string
+          description: 'Provider'
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list the cloud credentials accounts
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/credentials'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+    post:
+      tags: [credentials]
+      operationId: createCredentials
+      parameters:
+        - name: credentials
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/credentials'
+      security:
+        - Bearer: []
+      responses:
+        201:
+          description: Create a new cloud credential
+          schema:
+            $ref: '#/definitions/credentials'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/{id}:
+    put:
+      tags: [credentials]
+      operationId: updateCredentials
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: credentials
+          in: body
+          schema:
+            $ref: '#/definitions/credentials'
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/credentials'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    get:
+      tags: [credentials]
+      operationId: describeCredentials
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Describe a single cloud account credential
+          schema:
+            $ref: '#/definitions/credentials'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    delete:
+      tags: [credentials]
+      operationId: deleteCredentials
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        204:
+          description: Deleted cloud account credential
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /deployments:
+    get:
+      tags: [deployments]
+      operationId: listDeployments
+      parameters:
+        - name: provider
+          in: query
+          type: string
+          description: 'Provider'
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list the cloud deployments
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/deployment'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+    post:
+      tags: [deployments]
+      operationId: createDeployments
+      parameters:
+        - name: deployments
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/deployment'
+      security:
+        - Bearer: []
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: '#/definitions/deployment'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/aws/get_vpc/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAwsVpc
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the VPCs by the cloud provider
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/vpc'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/aws/get_keys/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAwsKeys
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the instance types by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/aws/get_subnets/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAwsSubnets
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: vpc_id
+          in: query
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the subnets by the cloud provider
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/subnet'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/aws/get_instance_types/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAwsInstanceTypes
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the instance types by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/aws/get_regions/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAwsRegions
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the regions by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/azure/get_keys/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAzureKeys
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the instance types by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/azure/get_virtual_network/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAzureVNet
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: resource_group
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the virtual network by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/azure/get_resource_group/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAzureResourceGroup
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: region
+          in: query
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the resource group by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/azure/get_subnets/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAzureSubnets
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: resource_group
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: virtual_network
+          in: query
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the subnets by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/azure/get_instance_types/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAzureInstanceTypes
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the instance types by the cloud provider
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/azure_instance_type'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/azure/get_regions/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAzureRegions
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the regions by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/gcp/get_project/{id}:
+    get:
+      tags: [credentials]
+      operationId: getGcpProject
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the GCP Projects
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/gcp/get_subnets/{id}:
+    get:
+      tags: [credentials]
+      operationId: getGcpSubnets
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: network
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the subnets by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/gcp/get_networks/{id}:
+    get:
+      tags: [credentials]
+      operationId: getGcpNetworks
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the networks by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/gcp/get_instance_types/{id}:
+    get:
+      tags: [credentials]
+      operationId: getGcpInstanceTypes
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: zone
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the instance types by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/gcp/get_regions/{id}:
+    get:
+      tags: [credentials]
+      operationId: getGcpRegions
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the regions by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/gcp/get_zones/{id}:
+    get:
+      tags: [credentials]
+      operationId: getGcpZones
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the zones by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/onpremise/get_data_if_name/{id}:
+    get:
+      tags: [credentials]
+      operationId: getOnpremIfName
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the data interface name by the cloud provider
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /deployments/{id}:
+    put:
+      tags: [deployments]
+      operationId: updateDeployments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: deployments
+          in: body
+          schema:
+            $ref: '#/definitions/deployment'
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/deployment'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    get:
+      tags: [deployments]
+      operationId: describeDeployments
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Describe a single cloud deployment
+          schema:
+            $ref: '#/definitions/deployment'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+    delete:
+      tags: [deployments]
+      operationId: deleteDeployments
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      security:
+        - Bearer: []
+      responses:
+        204:
+          description: Deleted cloud deployment
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+definitions:
+  Providers:
+    type: string
+    enum: &Providers
+      - aws
+      - gcp
+      - azure
+      - onpremise
+  certificates:
+    type: object
+    required:
+      - name
+      - cert
+    properties:
+      id:
+        type: string
+        minLength: 1
+      name:
+        type: string
+        minLength: 1
+      cert:
+        type: string
+        minLength: 1
+  dns:
+    type: object
+    required:
+      - name
+      - domainname
+      - zoneid
+    properties:
+      id:
+        type: string
+        minLength: 1
+      name:
+        type: string
+        minLength: 1
+      domainname:
+        type: string
+        minLength: 1
+      zoneid:
+        type: string
+        minLength: 1
+  arecord:
+    type: object
+    properties:
+      id:
+        type: string
+        minLength: 1
+      name:
+        type: string
+        minLength: 1
+      value:
+        type: array
+        items:
+          type: string
+  arcedgecredentials:
+    type: object
+    required:
+      - username
+      - password
+    properties:
+      id:
+        type: string
+        minLength: 1
+      username:
+        type: string
+        minLength: 1
+      password:
+        type: string
+        minLength: 1
+  connections:
+    type: object
+    required:
+      - name
+      - deployment1
+      - deployment2
+    properties:
+      id:
+        type: string
+        minLength: 1
+      name:
+        type: string
+        minLength: 1
+      deployment1:
+        $ref: '#/definitions/components'
+      deployment2:
+        $ref: '#/definitions/components'
+  components:
+    type: object
+    required:
+      - deploymentid
+      - type
+    properties:
+      deploymentid:
+        type: string
+        minLength: 1
+      type:
+        $ref: '#/definitions/componentTypes'
+  componentTypes:
+    type: string
+    enum: &componentTypes
+      - HUB
+      - SPOKE
+      - HUB & SPOKE
+  credentials:
+    type: object
+    required:
+      - name
+      - provider
+      - credentials
+    properties:
+      id:
+        type: string
+        minLength: 1
+      name:
+        type: string
+        minLength: 1
+      provider:
+        $ref: '#/definitions/Providers'
+      credentials:
+        allOf:
+          - $ref: '#/definitions/aws_credentials'
+          - $ref: '#/definitions/azure_credentials'
+          - $ref: '#/definitions/gcp_credentials'
+          - $ref: '#/definitions/onprem_credentials'
+  deployment:
+    type: object
+    required:
+      - credentials
+      - name
+    properties:
+      id:
+        type: string
+        minLength: 1
+      name:
+        type: string
+        minLength: 1
+      credentials_id:
+        type: string
+        minLength: 1
+      enable_high_availability:
+        type: boolean
+      enable_private_subnet:
+        type: boolean
+      arc_orch_ip:
+        type: string
+        minLength: 1
+      action:
+        type: string
+      status:
+        type: string
+      statusID:
+        type: integer
+      activeIP:
+        type: string
+      activeIPGateway:
+        type: string
+      activePrivateIP:
+        type: string
+      backupIP:
+        type: string
+      backupPrivateIP:
+        type: string
+      privateCidr:
+        type: string
+      ingressSg:
+        type: string
+      hubNumber:
+        type: integer
+      aws_deployment:
+        $ref: '#/definitions/aws_deployment'
+      azure_deployment:
+        $ref: '#/definitions/azure_deployment'
+      gcp_deployment:
+        $ref: '#/definitions/gcp_deployment'
+      onprem_deployment:
+        $ref: '#/definitions/onprem_deployment'
+      provider:
+        $ref: '#/definitions/Providers'
+      credentials:
+        allOf:
+          - $ref: '#/definitions/aws_credentials'
+          - $ref: '#/definitions/azure_credentials'
+          - $ref: '#/definitions/gcp_credentials'
+          - $ref: '#/definitions/onprem_credentials'
+  aws_credentials:
+    type: object
+    properties:
+      id:
+        type: string
+        minLength: 1
+      access_key:
+        type: string
+        minLength: 8
+      secret_key:
+        type: string
+        minLength: 8
+  azure_credentials:
+    type: object
+    properties:
+      id:
+        type: string
+        minLength: 1
+      subscription_id:
+        type: string
+        minLength: 8
+      client_id:
+        type: string
+        minLength: 8
+      client_secret:
+        type: string
+        minLength: 8
+      tenant_id:
+        type: string
+        minLength: 8
+  gcp_credentials:
+    type: object
+    properties:
+      id:
+        type: string
+        minLength: 1
+      type:
+        type: string
+        minLength: 1
+      project_id:
+        type: string
+        minLength: 1
+      private_key_id:
+        type: string
+        minLength: 1
+      private_key:
+        type: string
+        minLength: 1
+      client_email:
+        type: string
+        minLength: 1
+      clientId:
+        type: string
+        minLength: 1
+      auth_uri:
+        type: string
+        minLength: 1
+      token_uri:
+        type: string
+        minLength: 1
+      auth_provider_x509_cert_url:
+        type: string
+        minLength: 1
+      client_x509_cert_url:
+        type: string
+        minLength: 1
+  onprem_credentials:
+    type: object
+    properties:
+      id:
+        type: string
+        minLength: 1
+      server_ip:
+        type: string
+        minLength: 1
+      user_name:
+        type: string
+        minLength: 1
+      ssh_key:
+        type: string
+        minLength: 1
+      data_if_name:
+        type: array
+        items: 
+          type: string
+  subnet:
+    type: object
+    required:
+      - subnet_id
+      - tags
+    properties:
+      arn:
+        type: string
+        minLength: 1
+      subnet_id:
+        type: string
+        minLength: 1
+      tags:
+        type: array
+        items:
+          $ref: '#/definitions/tag'
+  tag:
+    type: object
+    required:
+      - key
+      - value
+    properties:
+      key:
+        type: string
+        minLength: 1
+      value:
+        type: string
+        minLength: 1
+  vpc:
+    type: object
+    required:
+      - vpc_id
+      - tags
+    properties:
+      vpc_id:
+        type: string
+        minLength: 1
+      tags:
+        type: array
+        items:
+          $ref: '#/definitions/tag'
+  login_request:
+    type: object
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+        minLength: 1
+      password:
+        type: string
+        minLength: 1
+  login_response:
+    type: object
+    required:
+      - access_token
+      - refresh_token
+    properties:
+      access_token:
+        type: string
+        minLength: 1
+      refresh_token:
+        type: string
+        minLength: 1
+  success_response:
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+  user:
+    type: object
+    required:
+      - name
+      - username
+      - password
+      - email
+    properties:
+      id:
+        type: string
+        minLength: 1
+      organization:
+        type: string
+        minLength: 1
+      name:
+        type: string
+        minLength: 1
+      username:
+        type: string
+        minLength: 1
+      password:
+        type: string
+        minLength: 1
+      email:
+        type: string
+        minLength: 1
+      is_default:
+        type: boolean
+  coordinates:
+    type: object
+    required:
+      - lat
+      - long
+    properties:
+      lat:
+        type: number
+      long:
+        type: number
+  aws_deployment:
+    type: object
+    properties:
+      instance_key:
+        type: string
+        minLength: 1
+      region:
+        type: string
+        minLength: 1
+      vpc_id:
+        type: string
+        minLength: 1
+      instance_type:
+        type: string
+        minLength: 1
+      public_subnet:
+        type: string
+        minLength: 1
+      private_subnet:
+        type: string
+        minLength: 1
+      coordinates:
+        $ref: '#/definitions/coordinates'
+  azure_deployment:
+    type: object
+    properties:
+      resource_group:
+        type: string
+        minLength: 1
+      instance_key:
+        $ref: '#/definitions/instance_key'
+      region:
+        type: string
+        minLength: 1
+      vnet:
+        type: string
+        minLength: 1
+      enable_accelerated_networking:
+        type: boolean
+      accelerated_networking_enabled:
+        type: boolean
+      instance_type:
+        type: string
+        minLength: 1
+      public_subnet:
+        type: string
+        minLength: 1
+      private_subnet:
+        type: string
+        minLength: 1
+      coordinates:
+        $ref: '#/definitions/coordinates'
+  gcp_deployment:
+    type: object
+    properties:
+      credentials_id:
+        type: string
+        minLength: 1
+      instance_key:
+        $ref: '#/definitions/instance_key'
+      arc_orch_ip:
+        type: string
+        minLength: 1
+      region:
+        type: string
+        minLength: 1
+      zone:
+        type: string
+        minLength: 1
+      public_network:
+        type: string
+        minLength: 1
+      public_subnet:
+        type: string
+        minLength: 1
+      private_network:
+        type: string
+        minLength: 1
+      private_subnet:
+        type: string
+        minLength: 1
+      instance_type:
+        type: string
+        minLength: 1
+      coordinates:
+        $ref: '#/definitions/coordinates'
+  onprem_deployment:
+    type: object
+    properties:
+      base_image:
+        type: string
+        minLength: 1
+      vm_count:
+        type: integer
+      vcpus:
+        type: integer
+      vm_memory:
+        type: integer
+      private_ip:
+        type: string
+        minLength: 1
+      public_ip:
+        type: string
+        minLength: 1
+      vlan_list:
+        type: array
+        items:
+          type: string
+      prefix:
+        type: string
+      ssh_psw:
+        type: string
+  azure_instance_type:
+    type: object
+    required:
+      - name
+      - accelerated_networking_enabled
+    properties:
+      name:
+        type: string
+      accelerated_networking_enabled:
+        type: boolean
+  instance_key:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+      content:
+        type: string
+  error:
+    type: object
+    required:
+      - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string

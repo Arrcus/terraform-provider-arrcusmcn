@@ -1,0 +1,144 @@
+package utils
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+)
+
+func StrPtr(s string) *string {
+	return &s
+}
+
+func Int64Ptr(i int) *int64 {
+	r := int64(i)
+	return &r
+}
+
+func IntPtr(i int) *int {
+	return &i
+}
+
+func Float64Ptr(f float64) *float64 {
+	return &f
+}
+
+func GetRequest(url string, accessToken string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("authorization", accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func PostRequest(url string, b interface{}, accessToken string) (*http.Response, error) {
+	jsonByte, err := json.Marshal(b)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonByte))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("authorization", accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 201 {
+		body, _ := ioutil.ReadAll(res.Body)
+		return nil, errors.New(fmt.Sprint(string(body)))
+	}
+	return res, nil
+}
+
+func DeleteRequest(url string, objId string, accessToken string, b interface{}) error {
+	var req *http.Request
+	var err error
+	if b == nil {
+		req, err = http.NewRequest("DELETE", url+"/"+objId, nil)
+	} else {
+		jsonByte, err := json.Marshal(b)
+		if err != nil {
+			return err
+		}
+		req, err = http.NewRequest("DELETE", url+"/"+objId, bytes.NewBuffer(jsonByte))
+	}
+	if err != nil {
+		return err
+	}
+	client := &http.Client{}
+	req.Header.Set("authorization", accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != 204 {
+		body, _ := ioutil.ReadAll(res.Body)
+		return errors.New(fmt.Sprint(string(body)))
+	}
+	return nil
+}
+
+func PutRequest(url string, b interface{}, accessToken string) (*http.Response, error) {
+	jsonByte, err := json.Marshal(b)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonByte))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("authorization", accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		body, _ := ioutil.ReadAll(res.Body)
+		return nil, errors.New(fmt.Sprint(string(body)))
+	}
+	return res, nil
+}
+
+func CheckFileExist(filePath string) bool {
+	info, err := os.Stat(filePath)
+	if os.IsNotExist(err) || info.IsDir() {
+		return false
+	}
+	return true
+}
+
+func ReadTextFile(file string) (*string, error) {
+	dat, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	res := string(dat)
+	return &res, nil
+}
+
+func GetPublicKeyName(keyContent string) (*string, error) {
+	sections := strings.Split(keyContent, " ")
+	if len(sections) != 3 {
+		return nil, errors.New("Given public key has no name section.")
+	}
+	return &sections[2], nil
+}
