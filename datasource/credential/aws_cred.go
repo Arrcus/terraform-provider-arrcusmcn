@@ -6,9 +6,9 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/Arrcus/terraform-provider-arcorch/models"
-	schemas "github.com/Arrcus/terraform-provider-arcorch/schemas/credential"
-	"github.com/Arrcus/terraform-provider-arcorch/utils"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/models"
+	schemas "github.com/Arrcus/terraform-provider-arrcusmcn/schemas/credential"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )

@@ -1,6 +1,6 @@
 terraform {
   required_providers {
-    arcorch = {
+    arrcusmcn = {
       version = "1.0.0"
       source = "arrcus.com/arrcus/arrcusmcn"
     }
@@ -14,13 +14,13 @@ provider "arrcusmcn" {
   port = "8000"
 }
 
-data "arcorch_aws_cred" "aws_cred" {
+data "arrcusmcn_aws_cred" "aws_cred" {
   name = "aws_cred"
 }
 
-resource "arcorch_aws_deployment" "arcorch_aws" {
+resource "arrcusmcn_aws_deployment" "arrcusmcn_aws" {
   name = "aws_hub"
-  credentials_id = data.arcorch_aws_cred.aws_cred.id
+  credentials_id = data.arrcusmcn_aws_cred.aws_cred.id
   public_subnet = "aws-subnet"
   region = "us-east-1"
   vpc_id = "aws-vpc"
@@ -32,5 +32,5 @@ resource "arcorch_aws_deployment" "arcorch_aws" {
 }
 
 output "arcedge" {
-  value = arcorch_aws_deployment.arcorch_aws
+  value = arrcusmcn_aws_deployment.arrcusmcn_aws
 }

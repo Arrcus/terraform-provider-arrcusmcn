@@ -1,11 +1,11 @@
-# <resource name> arcorch_user
+# <resource name> arrcusmcn_user
 
-The arcorch_user data source provides details of Arrcus MCN account used in Provder which currently logging in.
+The arrcusmcn_user data source provides details of Arrcus MCN account used in Provder which currently logging in.
 
 ## Example Usage
 
 ```hcl
-data "arcorch_user" "user" {}
+data "arrcusmcn_user" "user" {}
 
 ```
 

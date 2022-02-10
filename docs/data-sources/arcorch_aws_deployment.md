@@ -1,11 +1,11 @@
-# <resource name> arcorch_aws_deployment
+# <resource name> arrcusmcn_aws_deployment
 
-The arcorch_aws_deployment data source provides details of a specific ArcEdge created using the Arrcus ArcOrchestrator.
+The arrcusmcn_aws_deployment data source provides details of a specific ArcEdge created using the Arrcus ArcOrchestrator.
 
 ## Example Usage
 
 ```hcl
-data "arcorch_aws_deployment" "arcorch_aws" {
+data "arrcusmcn_aws_deployment" "arrcusmcn_aws" {
   name = "aws_hub"
 }
 ```

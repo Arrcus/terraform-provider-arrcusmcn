@@ -1,4 +1,4 @@
-module github.com/Arrcus/terraform-provider-arcorch
+module github.com/Arrcus/terraform-provider-arrcusmcn
 
 go 1.15
 

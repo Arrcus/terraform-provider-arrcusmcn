@@ -5,7 +5,16 @@ Arrcus-MCN provider is used to manage ArcEdge deployments running on different c
 ## Example Usage
 
 ```hcl
-provider "arcorch" {
+terraform {
+  required_providers {
+    arrcusmcn = {
+      version = "1.0.0"
+      source = "arrcus.com/arrcus/arrcusmcn"
+    }
+  }
+}
+
+provider "arrcusmcn" {
   username = "admin"
   password = "password"
   serverip = "1.2.3.4"

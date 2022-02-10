@@ -1,11 +1,11 @@
-# <resource name> arcorch_aws_cred
+# <resource name> arrcusmcn_aws_cred
 
-The arcorch_aws_cred data source provides details of a specific AWS credential created on the Arrcus ArcOrchestrator.
+The arrcusmcn_aws_cred data source provides details of a specific AWS credential created on the Arrcus ArcOrchestrator.
 
 ## Example Usage
 
 ```hcl
-data "arcorch_aws_cred" "aws_cred" {
+data "arrcusmcn_aws_cred" "aws_cred" {
   name = "aws_cred"
 }
 ```

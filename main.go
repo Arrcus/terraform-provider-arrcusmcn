@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Arrcus/terraform-provider-arcorch/provider"
+	"github.com/Arrcus/terraform-provider-arrcusmcn/provider"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )

@@ -1,17 +1,17 @@
-# <resource name> arcorch_aws_deployment
+# <resource name> arrcusmcn_aws_deployment
 
-arcorch_aws_deployment resource will be used to create ArcEdge deployments in the desired AWS account. 
+arrcusmcn_aws_deployment resource will be used to create ArcEdge deployments in the desired AWS account. 
 
 ## Example Usage
 
 ```hcl
-data "arcorch_aws_cred" "aws_cred" {
+data "arrcusmcn_aws_cred" "aws_cred" {
   name = "aws_cred"
 }
 
-resource "arcorch_aws_deployment" "arcorch_aws" {
+resource "arrcusmcn_aws_deployment" "arrcusmcn_aws" {
   name = "aws_hub"
-  credentials_id = data.arcorch_aws_cred.aws_cred.id
+  credentials_id = data.arrcusmcn_aws_cred.aws_cred.id
   public_subnet = "aws-subnet"
   region = "us-east-1"
   vpc_id = "aws-vpc"
