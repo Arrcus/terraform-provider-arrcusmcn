@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,7 +36,12 @@ func GetRequest(url string, accessToken string) (*http.Response, error) {
 	}
 	req.Header.Set("authorization", accessToken)
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -52,14 +58,21 @@ func PostRequest(url string, b interface{}, accessToken string) (*http.Response,
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("authorization", accessToken)
+	if accessToken != "" {
+		req.Header.Set("authorization", accessToken)
+	}
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	if res.StatusCode != 201 {
+	if res.StatusCode != 201 && res.StatusCode != 200 {
 		body, _ := ioutil.ReadAll(res.Body)
 		return nil, errors.New(fmt.Sprint(string(body)))
 	}
@@ -81,7 +94,12 @@ func DeleteRequest(url string, objId string, accessToken string, b interface{}) 
 	if err != nil {
 		return err
 	}
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
 	req.Header.Set("authorization", accessToken)
 	req.Header.Set("Content-Type", "application/json")
 	res, err := client.Do(req)
@@ -106,7 +124,12 @@ func PutRequest(url string, b interface{}, accessToken string) (*http.Response, 
 	}
 	req.Header.Set("authorization", accessToken)
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err

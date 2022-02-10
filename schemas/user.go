@@ -38,9 +38,11 @@ func ToUserSchema(user *models.User, d *schema.ResourceData) error {
 	if err != nil {
 		return err
 	}
-	err = d.Set("email", *user.Email)
-	if err != nil {
-		return err
+	if user.Email != nil {
+		err = d.Set("email", *user.Email)
+		if err != nil {
+			return err
+		}
 	}
 	err = d.Set("password", "")
 	if err != nil {

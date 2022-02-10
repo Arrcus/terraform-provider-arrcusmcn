@@ -1,13 +1,11 @@
 package provider
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/Arrcus/terraform-provider-arcorch/datasource"
 	dc "github.com/Arrcus/terraform-provider-arcorch/datasource/credential"
@@ -15,6 +13,7 @@ import (
 	"github.com/Arrcus/terraform-provider-arcorch/resource"
 	rc "github.com/Arrcus/terraform-provider-arcorch/resource/credential"
 	rd "github.com/Arrcus/terraform-provider-arcorch/resource/deployment"
+	"github.com/Arrcus/terraform-provider-arcorch/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -59,17 +58,14 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	port := d.Get("port").(string)
 	username := d.Get("username").(string)
 	password := d.Get("password").(string)
-	loginUrl := fmt.Sprintf(`http://%s:%s/api/login`, ipAddr, port)
+	loginUrl := fmt.Sprintf(`https://%s:%s/api/login`, ipAddr, port)
 	var diags diag.Diagnostics
 
-	postBody, _ := json.Marshal(map[string]string{
+	user := map[string]string{
 		"username": username,
 		"password": password,
-	})
-
-	responseBody := bytes.NewBuffer(postBody)
-
-	resp, err := http.Post(loginUrl, "application/json", responseBody)
+	}
+	resp, err := utils.PostRequest(loginUrl, user, "")
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
@@ -82,6 +78,6 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, diag.FromErr(err)
 	}
-	result["baseUrl"] = fmt.Sprintf(`http://%s:%s/api/`, ipAddr, port)
+	result["baseUrl"] = fmt.Sprintf(`https://%s:%s/api/`, ipAddr, port)
 	return result, diags
 }

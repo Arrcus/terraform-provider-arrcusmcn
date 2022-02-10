@@ -7,7 +7,7 @@ terraform {
   }
 }
 
-provider "arrcusmcn" {
+provider "arcorch" {
   username = "admin"
   password = "password"
   serverip = "1.2.3.4"
