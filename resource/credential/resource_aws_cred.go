@@ -28,7 +28,8 @@ func ResourceAwsCredential() *schema.Resource {
 func resourceAwsCredentialCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "cloud_credentials"
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "cloud_credentials?tenant=" + tenant
 	cred, err := schemas.ToAwsCredObj(d)
 	res, err := utils.PostRequest(url, *cred, accessToken)
 	if err != nil {
@@ -47,7 +48,8 @@ func resourceAwsCredentialCreate(ctx context.Context, d *schema.ResourceData, m 
 func resourceAwsCredentialRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "cloud_credentials/" + d.Id()
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "cloud_credentials/" + d.Id() + "?tenant=" + tenant
 	res, err := utils.GetRequest(url, accessToken)
 	if err != nil {
 		return diag.FromErr(err)
@@ -73,7 +75,8 @@ func resourceAwsCredentialRead(ctx context.Context, d *schema.ResourceData, m in
 func resourceAwsCredentialUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "cloud_credentials/" + d.Id()
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "cloud_credentials/" + d.Id() + "?tenant=" + tenant
 	cred, err := schemas.ToAwsCredObj(d)
 	if err != nil {
 		return diag.FromErr(err)
@@ -88,8 +91,9 @@ func resourceAwsCredentialUpdate(ctx context.Context, d *schema.ResourceData, m 
 func resourceAwsCredentialDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "cloud_credentials"
-	err := utils.DeleteRequest(url, d.Id(), accessToken, nil)
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "cloud_credentials/" + d.Id() + "?tenant=" + tenant
+	err := utils.DeleteRequest(url, accessToken)
 	if err != nil {
 		return diag.FromErr(err)
 	}

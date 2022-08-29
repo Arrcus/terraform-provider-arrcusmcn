@@ -29,6 +29,14 @@ func Float64Ptr(f float64) *float64 {
 	return &f
 }
 
+func AppendQueryToURL(url string, querys map[string]string) string {
+	var sb strings.Builder
+	for k, v := range querys {
+		sb.WriteString(k + "=" + v + "&")
+	}
+	return url + "?" + sb.String()
+}
+
 func GetRequest(url string, accessToken string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -79,18 +87,10 @@ func PostRequest(url string, b interface{}, accessToken string) (*http.Response,
 	return res, nil
 }
 
-func DeleteRequest(url string, objId string, accessToken string, b interface{}) error {
+func DeleteRequest(url string, accessToken string) error {
 	var req *http.Request
 	var err error
-	if b == nil {
-		req, err = http.NewRequest("DELETE", url+"/"+objId, nil)
-	} else {
-		jsonByte, err := json.Marshal(b)
-		if err != nil {
-			return err
-		}
-		req, err = http.NewRequest("DELETE", url+"/"+objId, bytes.NewBuffer(jsonByte))
-	}
+	req, err = http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return err
 	}

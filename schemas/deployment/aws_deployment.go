@@ -140,7 +140,7 @@ func ToAwsDeploymentObj(d *schema.ResourceData) *models.Deployment {
 	res.PrivateCidr = *utils.StrPtr(d.Get("private_cidr").(string))
 	res.IngressSg = *utils.StrPtr(d.Get("ingress_sg").(string))
 	res.HubNumber = *utils.Int64Ptr(d.Get("hub_number").(int))
-	res.AwsDeployment.Coordinates = &models.Coordinates{
+	res.Coordinates = &models.Coordinates{
 		Lat:  utils.Float64Ptr(d.Get("coordinates_lat").(float64)),
 		Long: utils.Float64Ptr(d.Get("coordinates_long").(float64)),
 	}
@@ -151,16 +151,7 @@ func ToAwsDeploymentObj(d *schema.ResourceData) *models.Deployment {
 }
 
 func UpdateAwsDeploymentResource(deployment *models.AwsDeployment, d *schema.ResourceData) error {
-	err := d.Set("coordinates_lat", deployment.Coordinates.Lat)
-	if err != nil {
-		return err
-	}
-	err = d.Set("coordinates_long", deployment.Coordinates.Long)
-	if err != nil {
-		return err
-	}
-
-	err = d.Set("instance_key", deployment.InstanceKey)
+	err := d.Set("instance_key", deployment.InstanceKey)
 	if err != nil {
 		return err
 	}

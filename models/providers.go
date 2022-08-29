@@ -20,8 +20,12 @@ import (
 type Providers string
 
 func NewProviders(value Providers) *Providers {
-	v := value
-	return &v
+	return &value
+}
+
+// Pointer returns a pointer to a freshly-allocated Providers.
+func (m Providers) Pointer() *Providers {
+	return &m
 }
 
 const (

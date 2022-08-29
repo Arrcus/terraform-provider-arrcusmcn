@@ -47,6 +47,9 @@ type Deployment struct {
 	// backup private IP
 	BackupPrivateIP string `json:"backupPrivateIP,omitempty"`
 
+	// coordinates
+	Coordinates *Coordinates `json:"coordinates,omitempty"`
+
 	// credentials
 	// Required: true
 	Credentials struct {
@@ -119,6 +122,10 @@ func (m *Deployment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateCoordinates(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCredentials(formats); err != nil {
 		res = append(res, err)
 	}
@@ -174,6 +181,8 @@ func (m *Deployment) validateAwsDeployment(formats strfmt.Registry) error {
 		if err := m.AwsDeployment.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("aws_deployment")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("aws_deployment")
 			}
 			return err
 		}
@@ -191,6 +200,27 @@ func (m *Deployment) validateAzureDeployment(formats strfmt.Registry) error {
 		if err := m.AzureDeployment.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("azure_deployment")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("azure_deployment")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Deployment) validateCoordinates(formats strfmt.Registry) error {
+	if swag.IsZero(m.Coordinates) { // not required
+		return nil
+	}
+
+	if m.Coordinates != nil {
+		if err := m.Coordinates.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("coordinates")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("coordinates")
 			}
 			return err
 		}
@@ -225,6 +255,8 @@ func (m *Deployment) validateGcpDeployment(formats strfmt.Registry) error {
 		if err := m.GcpDeployment.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("gcp_deployment")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("gcp_deployment")
 			}
 			return err
 		}
@@ -267,6 +299,8 @@ func (m *Deployment) validateOnpremDeployment(formats strfmt.Registry) error {
 		if err := m.OnpremDeployment.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("onprem_deployment")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("onprem_deployment")
 			}
 			return err
 		}
@@ -283,6 +317,8 @@ func (m *Deployment) validateProvider(formats strfmt.Registry) error {
 	if err := m.Provider.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("provider")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("provider")
 		}
 		return err
 	}
@@ -299,6 +335,10 @@ func (m *Deployment) ContextValidate(ctx context.Context, formats strfmt.Registr
 	}
 
 	if err := m.contextValidateAzureDeployment(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateCoordinates(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -330,6 +370,8 @@ func (m *Deployment) contextValidateAwsDeployment(ctx context.Context, formats s
 		if err := m.AwsDeployment.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("aws_deployment")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("aws_deployment")
 			}
 			return err
 		}
@@ -344,6 +386,24 @@ func (m *Deployment) contextValidateAzureDeployment(ctx context.Context, formats
 		if err := m.AzureDeployment.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("azure_deployment")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("azure_deployment")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Deployment) contextValidateCoordinates(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Coordinates != nil {
+		if err := m.Coordinates.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("coordinates")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("coordinates")
 			}
 			return err
 		}
@@ -363,6 +423,8 @@ func (m *Deployment) contextValidateGcpDeployment(ctx context.Context, formats s
 		if err := m.GcpDeployment.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("gcp_deployment")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("gcp_deployment")
 			}
 			return err
 		}
@@ -377,6 +439,8 @@ func (m *Deployment) contextValidateOnpremDeployment(ctx context.Context, format
 		if err := m.OnpremDeployment.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("onprem_deployment")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("onprem_deployment")
 			}
 			return err
 		}
@@ -390,6 +454,8 @@ func (m *Deployment) contextValidateProvider(ctx context.Context, formats strfmt
 	if err := m.Provider.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("provider")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("provider")
 		}
 		return err
 	}

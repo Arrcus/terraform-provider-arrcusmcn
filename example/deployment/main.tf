@@ -8,10 +8,10 @@ terraform {
 }
 
 provider "arrcusmcn" {
-  username = "admin"
-  password = "password"
-  serverip = "1.2.3.4"
-  port = "8000"
+  username = "admin@coke1.com"
+  password = "coke123"
+  serverip = "172.16.102.113"
+  port = "443"
 }
 
 data "arrcusmcn_aws_cred" "aws_cred" {
@@ -19,14 +19,14 @@ data "arrcusmcn_aws_cred" "aws_cred" {
 }
 
 resource "arrcusmcn_aws_deployment" "arrcusmcn_aws" {
-  name = "aws_hub"
+  name = "tingcih-aws"
   credentials_id = data.arrcusmcn_aws_cred.aws_cred.id
-  public_subnet = "aws-subnet"
+  public_subnet = "subnet-0eafefaf92e79895d"
   region = "us-east-1"
-  vpc_id = "aws-vpc"
+  vpc_id = "vpc-07f11c57735551934"
   instance_key = "arcedge"
   instance_type = "t2.medium"
-  private_subnet = ""
+  private_subnet = "subnet-0e7cf30920754f767"
   enable_high_availability = false
   enable_private_subnet = false
 }

@@ -43,7 +43,7 @@ func DataSourceUser() *schema.Resource {
 func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "get_user_info"
+	url := m.(map[string]string)["baseUrl"] + "users"
 	res, err := utils.GetRequest(url, accessToken)
 	if err != nil {
 		return diag.FromErr(err)
@@ -63,6 +63,6 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.SetId(user.ID)
+	d.SetId(user.ID.String())
 	return diags
 }

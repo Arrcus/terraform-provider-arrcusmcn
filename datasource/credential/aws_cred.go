@@ -36,7 +36,8 @@ func DataSourceAwsCred() *schema.Resource {
 func dataSourceAwsCredRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "cloud_credentials?provider=aws"
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "cloud_credentials?provider=aws" + "&tenant=" + tenant
 	res, err := utils.GetRequest(url, accessToken)
 	if err != nil {
 		return diag.FromErr(err)

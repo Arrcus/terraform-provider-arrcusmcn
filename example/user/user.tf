@@ -8,14 +8,10 @@ terraform {
 }
 
 provider "arrcusmcn" {
-  username = "admin"
-  password = "password"
-  serverip = "1.2.3.4"
-  port = "8000"
-}
-
-data "arrcusmcn_user" "user" {
-  
+  username = "admin@coke1.com"
+  password = "coke123"
+  serverip = "172.16.102.113"
+  port = "443"
 }
 
 /*
@@ -26,12 +22,15 @@ If you want to update user without create it, please follow:
 3. Run `terraform import arrcusmcn_user.user {id}` to import existing user.
 4. Run `terraform apply`
 */
+
 resource "arrcusmcn_user" "user" {
-  username = "username"
-  password = "user_password"
-  email = "example@email.com"
+  name = "coke1 coke2"
+  username = "coke@coke1.com"
+  password = "coke123"
+  email = "coke@coke1.com"
+  roles = ["TenantOperator"]
 }
 
 output "user" {
-  value = data.arrcusmcn_user.user
+  value = resource.arrcusmcn_user.user
 }

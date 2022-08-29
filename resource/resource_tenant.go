@@ -3,7 +3,6 @@ package resource
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 
 	"github.com/Arrcus/terraform-provider-arrcusmcn/models"
@@ -13,49 +12,48 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func ResourceUser() *schema.Resource {
+func ResourceTenant() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceUserCreate,
-		ReadContext:   resourceUserRead,
-		UpdateContext: resourceUserUpdate,
-		DeleteContext: resourceUserDelete,
-		Schema:        schemas.UserSchema(),
+		CreateContext: resourceTenantCreate,
+		ReadContext:   resourceTenantRead,
+		UpdateContext: resourceTenantUpdate,
+		DeleteContext: resourceTenantDelete,
+		Schema:        schemas.TenantSchema(),
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }
 
-func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	tenant := m.(map[string]string)["tenant"]
 	accessToken := m.(map[string]string)["access_token"]
 
-	url := m.(map[string]string)["baseUrl"] + "users?tenant=" + tenant
-	user, err := schemas.ToUserObj(d)
+	url := m.(map[string]string)["baseUrl"] + "tenants"
+	tenant, err := schemas.ToTenantObj(d)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	res, err := utils.PostRequest(url, *user, accessToken)
+	// return diag.FromErr(errors.New(fmt.Sprintf("%v", *tenant)))
+	res, err := utils.PostRequest(url, *tenant, accessToken)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	resBody, _ := ioutil.ReadAll(res.Body)
-	resUser := models.User{}
-	err = json.Unmarshal(resBody, &resUser)
+	resTenant := models.Tenant{}
+	err = json.Unmarshal(resBody, &resTenant)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.SetId(resUser.ID.String())
+	d.SetId(resTenant.ID.String())
 	return diags
 }
 
-func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
-	tenant := m.(map[string]string)["tenant"]
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "users/" + d.Id() + "?tenant=" + tenant
+	url := m.(map[string]string)["baseUrl"] + "tenants/" + d.Id()
 	// return diag.FromErr(errors.New("url"))
 	res, err := utils.GetRequest(url, accessToken)
 	// return diag.FromErr(err)
@@ -68,29 +66,22 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diag.FromErr(err)
 	}
 
-	resUser := models.User{}
-	err = json.Unmarshal(resBody, &resUser)
+	resTenant := models.Tenant{}
+	err = json.Unmarshal(resBody, &resTenant)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = schemas.ToUserSchema(&resUser, d)
+	err = schemas.ToTenantSchema(&resTenant, d)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	return diags
 }
 
-func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	if d.HasChange("name") {
-		return diag.Errorf(fmt.Sprintf("name can't be changed"))
-	}
-	if d.HasChange("username") {
-		return diag.Errorf("username can't be changed")
-	}
-	tenant := m.(map[string]string)["tenant"]
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "users/" + d.Id() + "?tenant=" + tenant
+	url := m.(map[string]string)["baseUrl"] + "tenants/" + d.Id()
 	user, err := schemas.ToUserObj(d)
 	if err != nil {
 		return diag.FromErr(err)
@@ -105,14 +96,14 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	// d.SetId(resUser.ID)
 	return diags
 }
 
-func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	tenant := m.(map[string]string)["tenant"]
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "users/" + d.Id() + "?tenant=" + tenant
+	url := m.(map[string]string)["baseUrl"] + "tenants/" + d.Id()
 	err := utils.DeleteRequest(url, accessToken)
 	if err != nil {
 		return diag.FromErr(err)

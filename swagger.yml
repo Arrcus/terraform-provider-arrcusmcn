@@ -8,44 +8,17 @@ consumes: [application/json]
 produces: [application/json]
 schemes:
   - http
-basePath: /api
+basePath: /api/v1
 securityDefinitions:
   Bearer:
     type: apiKey
     name: Authorization
     in: header
 paths:
-  /get_user_info:
-    get:
-      tags: [users]
-      operationId: getUserInfo
-      security:
-        - Bearer: []
-      responses:
-        200:
-          description: get a single use info based on the JWT token
-          schema:
-            $ref: '#/definitions/user'
-        400:
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/error'
-        404:
-          description: Not found
-          schema:
-            $ref: '#/definitions/error'
-        default:
-          description: generic error response
-          schema:
-            $ref: '#/definitions/error'
   /login:
     post:
       description: 'Returns token for authorized User'
-      tags: [user]
+      tags: [users]
       operationId: Login
       consumes:
         - "application/json"
@@ -56,6 +29,10 @@ paths:
           description: 'Login Payload'
           schema:
             $ref: '#/definitions/login_request'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       responses:
         200:
           description: Successful login
@@ -77,25 +54,29 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/error'
-  /register:
+  /passwords:
     post:
-      description: 'To register a new user'
-      tags: [user]
-      operationId: register
+      description: 'Change password for an authorized User'
+      tags: [password]
+      operationId: Change
       consumes:
-        - 'application/json'
+        - "application/json"
       parameters:
-        - name: user
-          in: body
+        - name: 'changerequest'
+          in: 'body'
           required: true
-          description: 'Registration payload'
+          description: 'Password change Payload'
           schema:
-            $ref: '#/definitions/user'
+            $ref: '#/definitions/password_change_request'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       responses:
         200:
-          description: Successful registration
+          description: Successful login
           schema:
-            $ref: '#/definitions/success_response'
+            $ref: '#/definitions/password_change_response'
         400:
           description: Bad Request
           schema:
@@ -112,7 +93,173 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/error'
+
+  /tenants/:
+    post:
+      tags: [tenants]
+      operationId: createTenant
+      parameters:
+        - name: tenant
+          in: body
+          schema:
+            $ref: "#/definitions/tenant"
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/tenant"
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    get:
+      tags: [tenants]
+      operationId: listTenants
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list the all the tenants
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/tenant'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /tenants/{id}:
+    get:
+      tags: [tenants]
+      operationId: describeTenants
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/tenant"
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    delete:
+      tags: [tenants]
+      operationId: deleteTenant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        204:
+          description: Deleted
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
   /users/:
+    post:
+      description: 'Create a new user'
+      tags: [users]
+      operationId: createUser
+      consumes:
+        - 'application/json'
+      parameters:
+        - name: user
+          in: body
+          required: true
+          description: 'Registration payload'
+          schema:
+            $ref: '#/definitions/user'
+        - name: tenant
+          in: query
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful registration
+          schema:
+            $ref: '#/definitions/user'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
     get:
       tags: [users]
       operationId: listUsers
@@ -122,6 +269,10 @@ paths:
           type: integer
           format: int32
           default: 100
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -154,6 +305,10 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
         - name: user
@@ -191,6 +346,10 @@ paths:
           in: path
           required: true
           type: string
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -220,6 +379,10 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -253,6 +416,10 @@ paths:
           type: integer
           format: int32
           default: 1
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -287,6 +454,10 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/certificates'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -317,6 +488,10 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
         - name: certificates
@@ -354,6 +529,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -385,6 +564,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -416,6 +599,10 @@ paths:
           type: integer
           format: int32
           default: 1
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -455,6 +642,10 @@ paths:
           type: integer
           format: int32
           default: 1
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -490,6 +681,10 @@ paths:
           type: integer
           format: int32
           default: 1
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -524,6 +719,10 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/dns'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -560,6 +759,10 @@ paths:
           in: body
           schema:
             $ref: '#/definitions/dns'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -591,6 +794,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -622,6 +829,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -653,6 +864,10 @@ paths:
           type: integer
           format: int32
           default: 1
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -687,6 +902,10 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/arcedgecredentials'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -723,6 +942,10 @@ paths:
           in: body
           schema:
             $ref: '#/definitions/arcedgecredentials'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -754,6 +977,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -785,6 +1012,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -816,6 +1047,10 @@ paths:
           type: integer
           format: int32
           default: 100
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -850,6 +1085,10 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/connections'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -886,6 +1125,10 @@ paths:
           in: body
           schema:
             $ref: '#/definitions/connections'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -917,6 +1160,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -948,6 +1195,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -983,6 +1234,10 @@ paths:
           type: integer
           format: int32
           default: 100
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1017,6 +1272,10 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/credentials'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1053,6 +1312,10 @@ paths:
           in: body
           schema:
             $ref: '#/definitions/credentials'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1084,6 +1347,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1115,6 +1382,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1150,6 +1421,10 @@ paths:
           type: integer
           format: int32
           default: 100
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1184,6 +1459,10 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/deployment'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1207,7 +1486,54 @@ paths:
           description: error
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/aws/get_vpc/{id}:
+  /cloud_credentials/aws/byoips/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAwsByoips
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Get the unassociated Elastic IPs available in the region
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/byoip'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/aws/vpcs/{id}:
     get:
       tags: [credentials]
       operationId: getAwsVpc
@@ -1223,6 +1549,10 @@ paths:
           required: true
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1250,7 +1580,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/aws/get_keys/{id}:
+  /cloud_credentials/aws/keys/{id}:
     get:
       tags: [credentials]
       operationId: getAwsKeys
@@ -1266,6 +1596,10 @@ paths:
           required: true
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1293,7 +1627,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/aws/get_subnets/{id}:
+  /cloud_credentials/aws/subnets/{id}:
     get:
       tags: [credentials]
       operationId: getAwsSubnets
@@ -1315,6 +1649,10 @@ paths:
           in: query
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1340,7 +1678,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/aws/get_instance_types/{id}:
+  /cloud_credentials/aws/instance_types/{id}:
     get:
       tags: [credentials]
       operationId: getAwsInstanceTypes
@@ -1356,6 +1694,10 @@ paths:
           required: true
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1383,7 +1725,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/aws/get_regions/{id}:
+  /cloud_credentials/aws/regions/{id}:
     get:
       tags: [credentials]
       operationId: getAwsRegions
@@ -1395,6 +1737,10 @@ paths:
           default: 100
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1422,7 +1768,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/azure/get_keys/{id}:
+  /cloud_credentials/azure/keys/{id}:
     get:
       tags: [credentials]
       operationId: getAzureKeys
@@ -1434,6 +1780,10 @@ paths:
           default: 100
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1461,7 +1811,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/azure/get_virtual_network/{id}:
+  /cloud_credentials/azure/virtual_networks/{id}:
     get:
       tags: [credentials]
       operationId: getAzureVNet
@@ -1477,6 +1827,10 @@ paths:
           required: true
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1504,7 +1858,58 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/azure/get_resource_group/{id}:
+  /cloud_credentials/azure/byoips/{id}:
+    get:
+      tags: [credentials]
+      operationId: getAzureByoips
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: resource_group
+          in: query
+          type: string
+          required: true
+        - name: region
+          in: query
+          required: true
+          type: string
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of unassociated Elastic IP's available
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/byoip'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/azure/resource_groups/{id}:
     get:
       tags: [credentials]
       operationId: getAzureResourceGroup
@@ -1519,6 +1924,10 @@ paths:
           required: true
           type: string
         - name: region
+          in: query
+          required: true
+          type: string
+        - name: tenant
           in: query
           required: true
           type: string
@@ -1547,7 +1956,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/azure/get_subnets/{id}:
+  /cloud_credentials/azure/subnets/{id}:
     get:
       tags: [credentials]
       operationId: getAzureSubnets
@@ -1569,6 +1978,10 @@ paths:
           in: query
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -1594,7 +2007,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/azure/get_instance_types/{id}:
+  /cloud_credentials/azure/instance_types/{id}:
     get:
       tags: [credentials]
       operationId: getAzureInstanceTypes
@@ -1610,6 +2023,10 @@ paths:
           required: true
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1637,7 +2054,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/azure/get_regions/{id}:
+  /cloud_credentials/azure/regions/{id}:
     get:
       tags: [credentials]
       operationId: getAzureRegions
@@ -1649,6 +2066,10 @@ paths:
           default: 100
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1676,7 +2097,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/gcp/get_project/{id}:
+  /cloud_credentials/gcp/projects/{id}:
     get:
       tags: [credentials]
       operationId: getGcpProject
@@ -1688,6 +2109,10 @@ paths:
           default: 100
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1715,7 +2140,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/gcp/get_subnets/{id}:
+  /cloud_credentials/gcp/subnets/{id}:
     get:
       tags: [credentials]
       operationId: getGcpSubnets
@@ -1735,6 +2160,10 @@ paths:
           required: true
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1762,7 +2191,54 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/gcp/get_networks/{id}:
+  /cloud_credentials/gcp/byoips/{id}:
+    get:
+      tags: [credentials]
+      operationId: getGcpByoips
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: region
+          in: query
+          type: string
+          required: true
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list of the reserved IPs by the cloud provider
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/byoip'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /cloud_credentials/gcp/networks/{id}:
     get:
       tags: [credentials]
       operationId: getGcpNetworks
@@ -1774,6 +2250,10 @@ paths:
           default: 100
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1801,7 +2281,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/gcp/get_instance_types/{id}:
+  /cloud_credentials/gcp/instance_types/{id}:
     get:
       tags: [credentials]
       operationId: getGcpInstanceTypes
@@ -1817,6 +2297,10 @@ paths:
           required: true
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1844,7 +2328,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/gcp/get_regions/{id}:
+  /cloud_credentials/gcp/regions/{id}:
     get:
       tags: [credentials]
       operationId: getGcpRegions
@@ -1856,6 +2340,10 @@ paths:
           default: 100
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1883,7 +2371,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/gcp/get_zones/{id}:
+  /cloud_credentials/gcp/zones/{id}:
     get:
       tags: [credentials]
       operationId: getGcpZones
@@ -1899,6 +2387,10 @@ paths:
           required: true
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1926,7 +2418,7 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
-  /cloud_credentials/onpremise/get_data_if_name/{id}:
+  /cloud_credentials/onpremise/data_if_names/{id}:
     get:
       tags: [credentials]
       operationId: getOnpremIfName
@@ -1938,6 +2430,10 @@ paths:
           default: 100
         - name: id
           in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
           required: true
           type: string
       security:
@@ -1978,6 +2474,10 @@ paths:
           in: body
           schema:
             $ref: '#/definitions/deployment'
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -2009,6 +2509,10 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
@@ -2040,11 +2544,306 @@ paths:
           in: path
           type: string
           required: true
+        - name: tenant
+          in: query
+          required: true
+          type: string
       security:
         - Bearer: []
       responses:
         204:
           description: Deleted cloud deployment
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /deployments/{id}/logs:
+    get:
+      tags: [deployments]
+      operationId: listLogs
+      parameters:
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          default: 100
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: tenant
+          in: query
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: list the all the terraform logs of given deployment
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/terraform_log'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /upgrade:
+    put:
+      tags: [maintenance]
+      operationId: upgrade
+      parameters: []
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/upgrade'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /upgrade/cancel:
+    put:
+      tags: [maintenance]
+      operationId: upgradeCancel
+      parameters: []
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /upgrade/available:
+    get:
+      tags: [maintenance]
+      operationId: upgradeAvailable
+      parameters: []
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/upgrade_check'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: error
+          schema:
+            $ref: '#/definitions/error'
+  /ttyd:
+    get:
+      tags: [ttyd]
+      operationId: ttyd
+      parameters:
+        - name: id
+          in: query
+          required: true
+          type: string
+        - name: ip
+          in: query
+          required: true
+          type: string
+        - name: token
+          in: query
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: UI console
+          schema:
+            type: array
+            items:
+              type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /ttyd/token:
+    get:
+      tags: [ttyd]
+      operationId: ttydtoken
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: ttyd token
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /ttyd/ws:
+    get:
+      tags: [ttyd]
+      operationId: ttydws
+      parameters:
+        - name: id
+          in: query
+          required: true
+          type: string
+        - name: ip
+          in: query
+          required: true
+          type: string
+        - name: token
+          in: query
+          required: true
+          type: string
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: ttyd websocket
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /status:
+    get:
+      tags: [status]
+      operationId: getStatus
+      responses:
+        200:
+          description: UI console
+          schema:
+            $ref: '#/definitions/server_status'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
+  /version:
+    get:
+      description: 'Returns version of ArcOrchestrator'
+      tags: [version]
+      operationId: getVersion
+      responses:
+        200:
+          description: Version of ArcOrchestrator
+          schema:
+            $ref: '#/definitions/arcorch_version'
         400:
           description: Bad Request
           schema:
@@ -2103,6 +2902,8 @@ definitions:
       zoneid:
         type: string
         minLength: 1
+      credential_id:
+        type: string
   arecord:
     type: object
     properties:
@@ -2186,6 +2987,9 @@ definitions:
           - $ref: '#/definitions/azure_credentials'
           - $ref: '#/definitions/gcp_credentials'
           - $ref: '#/definitions/onprem_credentials'
+      numdeployments:
+        type: integer
+        x-omitempty: false
   deployment:
     type: object
     required:
@@ -2230,6 +3034,8 @@ definitions:
         type: string
       hubNumber:
         type: integer
+      coordinates:
+        $ref: '#/definitions/coordinates'
       aws_deployment:
         $ref: '#/definitions/aws_deployment'
       azure_deployment:
@@ -2321,6 +3127,9 @@ definitions:
       server_ip:
         type: string
         minLength: 1
+      use_pvt_ip:
+        type: boolean
+        default: true
       user_name:
         type: string
         minLength: 1
@@ -2331,6 +3140,10 @@ definitions:
         type: array
         items: 
           type: string
+      site_address:
+        type: string
+      coordinates:
+        $ref: '#/definitions/coordinates'
   subnet:
     type: object
     required:
@@ -2359,6 +3172,19 @@ definitions:
       value:
         type: string
         minLength: 1
+  byoip:
+    type: object
+    required:
+      - eip
+      - tags
+    properties:
+      eip:
+        type: string
+        minLength: 1
+      tags:
+        type: array
+        items:
+          $ref: '#/definitions/tag'
   vpc:
     type: object
     required:
@@ -2375,9 +3201,13 @@ definitions:
   login_request:
     type: object
     required:
+      - tenant
       - username
       - password
     properties:
+      tenant:
+        type: string
+        minLength: 1
       username:
         type: string
         minLength: 1
@@ -2396,6 +3226,25 @@ definitions:
       refresh_token:
         type: string
         minLength: 1
+  password_change_request:
+    type: object
+    required:
+      - userlogin
+      - newpassword
+    properties:
+      userlogin:
+        $ref: '#/definitions/login_request'
+      newpassword:
+        type: string
+        minLength: 1
+  password_change_response:
+    type: object
+    required:
+      - user
+    properties:
+      user:
+        $ref: '#/definitions/user'
+
   success_response:
     type: object
     properties:
@@ -2410,27 +3259,37 @@ definitions:
       - username
       - password
       - email
+      - roles
     properties:
       id:
         type: string
         minLength: 1
-      organization:
-        type: string
-        minLength: 1
+        readOnly: true
+        format: ObjectId
+        x-go-custom-tag: bson:"_id, omitempty"
       name:
         type: string
         minLength: 1
       username:
         type: string
-        minLength: 1
+        minLength: 1        
       password:
         type: string
-        minLength: 1
       email:
         type: string
         minLength: 1
       is_default:
         type: boolean
+        readOnly: true
+        x-omitempty: false
+      is_default_password:
+        type: boolean
+        readOnly: true
+        x-omitempty: false
+      roles:  
+        type: array
+        items: {$ref: '#/definitions/rolename'}
+
   coordinates:
     type: object
     required:
@@ -2450,6 +3309,9 @@ definitions:
       region:
         type: string
         minLength: 1
+      byoip:
+        type: string
+        minLength: 1
       vpc_id:
         type: string
         minLength: 1
@@ -2462,8 +3324,9 @@ definitions:
       private_subnet:
         type: string
         minLength: 1
-      coordinates:
-        $ref: '#/definitions/coordinates'
+      private_subnet_route_table:
+        type: string
+        minLength: 1
   azure_deployment:
     type: object
     properties:
@@ -2476,6 +3339,9 @@ definitions:
         type: string
         minLength: 1
       vnet:
+        type: string
+        minLength: 1
+      byoip:
         type: string
         minLength: 1
       enable_accelerated_networking:
@@ -2491,8 +3357,6 @@ definitions:
       private_subnet:
         type: string
         minLength: 1
-      coordinates:
-        $ref: '#/definitions/coordinates'
   gcp_deployment:
     type: object
     properties:
@@ -2510,6 +3374,9 @@ definitions:
       zone:
         type: string
         minLength: 1
+      byoip:
+        type: string
+        minLength: 1
       public_network:
         type: string
         minLength: 1
@@ -2525,8 +3392,6 @@ definitions:
       instance_type:
         type: string
         minLength: 1
-      coordinates:
-        $ref: '#/definitions/coordinates'
   onprem_deployment:
     type: object
     properties:
@@ -2539,6 +3404,10 @@ definitions:
         type: integer
       vm_memory:
         type: integer
+      use_pvt_ip:
+        type: boolean
+        readOnly: true
+        default: true
       private_ip:
         type: string
         minLength: 1
@@ -2553,6 +3422,11 @@ definitions:
         type: string
       ssh_psw:
         type: string
+      subnet_mask:
+        type: integer 
+      default_gw:
+        type: string
+        minLength: 1
   azure_instance_type:
     type: object
     required:
@@ -2572,6 +3446,96 @@ definitions:
         type: string
       content:
         type: string
+  tenant:
+    type: object
+    required:
+      - name
+      - defaultuser
+      - domain
+    properties:
+      id:
+        type: string
+        minLength: 1
+        readOnly: true
+        format: ObjectId
+        x-go-custom-tag: bson:"_id, omitempty"
+      name:
+        type: string
+        minLength: 1
+      organization:
+        type: string
+        minLength: 1
+      domain:  
+        type: string
+        minLength: 1
+      defaultuser:
+        $ref: '#/definitions/user' 
+      numdeployments:
+        type: integer
+        readOnly: true
+        x-omitempty: false
+      numconnections:
+        type: integer
+        readOnly: true
+        x-omitempty: false
+      is_default:
+        type: boolean
+        readOnly: true
+        x-omitempty: false
+  terraform_log:
+    type: object
+    properties:
+      id:
+        type: string
+      deployment_id:
+        type: string
+        minLength: 1
+      time:
+        type: string
+        minLength: 1
+      operation:
+        type: string
+      initiator:
+        type: string
+      log:
+        type: string
+        readOnly: true
+
+  permission:
+    type : object
+    additionalProperties:
+      $ref: '#/definitions/access'
+
+  role:
+    type: object
+    required:
+      - name
+      - resourceperms
+    properties:
+      id:
+        type: string
+        minLength: 1
+      name:
+        $ref: '#/definitions/rolename'
+      resourceperms:
+        type: array
+        items: {$ref: '#/definitions/permission'}
+  rolename:
+    type: string
+    enum: [ArcOrchAdmin, TenantAdmin,TenantOperator]
+  access:
+    type: string
+    enum: [r, rw]
+  resource:
+    type: string
+    enum: [tenants,users,cloud_credentials,deployments,connections,arcedge_credentials,certificates,dns,upgrade]
+  arcorch_version:
+    type: object
+    properties:
+      version:
+        type: string
+      platform:
+        type: string
   error:
     type: object
     required:
@@ -2582,3 +3546,45 @@ definitions:
         format: int64
       message:
         type: string
+  upgrade_check:
+    type: object
+    required:
+      - available
+    properties:
+      available:
+        type: boolean
+      currentVersion:
+        type: string
+      currentImage:
+        type: string
+      latestVersion:
+        type: string
+      latestImage:
+        type: string
+  upgrade:
+    type: object
+    required:
+      - status
+    properties:
+      status:
+        type: boolean
+      statusMessage:
+        type: string
+      currentVersion:
+        type: string
+      currentImageName:
+        type: string
+      currentImageId:
+        type: string
+      latestVersion:
+        type: string
+      latestImageName:
+        type: string
+      latestImageId:
+        type: string
+  server_status:
+    type: object
+    properties:
+      status:
+        type: string
+        enum: [running, upgrading]

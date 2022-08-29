@@ -29,7 +29,8 @@ func ResourceAwsDeployment() *schema.Resource {
 func resourceAwsDeploymentCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "deployments"
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "deployments?tenant=" + tenant
 	deployment := schemas.ToAwsDeploymentObj(d)
 	res, err := utils.PostRequest(url, *deployment, accessToken)
 	if err != nil {
@@ -56,7 +57,8 @@ func resourceAwsDeploymentCreate(ctx context.Context, d *schema.ResourceData, m 
 func resourceAwsDeploymentRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "deployments/" + d.Id()
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "deployments/" + d.Id() + "?tenant=" + tenant
 	res, err := utils.GetRequest(url, accessToken)
 
 	if err != nil {
@@ -91,7 +93,8 @@ func resourceAwsDeploymentRead(ctx context.Context, d *schema.ResourceData, m in
 func resourceAwsDeploymentUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "deployments/" + d.Id()
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "deployments/" + d.Id() + "?tenant=" + tenant
 	deployment := schemas.ToAwsDeploymentObj(d)
 	res, err := utils.PutRequest(url, *deployment, accessToken)
 	if err != nil {
@@ -117,8 +120,9 @@ func resourceAwsDeploymentUpdate(ctx context.Context, d *schema.ResourceData, m 
 func resourceAwsDeploymentDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "deployments"
-	err := utils.DeleteRequest(url, d.Id(), accessToken, schemas.ToAwsDeploymentObj(d))
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "deployments/" + d.Id() + "?tenant=" + tenant
+	err := utils.DeleteRequest(url, accessToken)
 	if err != nil {
 		return diag.FromErr(err)
 	}
