@@ -8,19 +8,19 @@ terraform {
 }
 
 provider "arrcusmcn" {
-  username = "admin"
-  password = "Arrcus2018"
-  serverip = "172.16.102.113"
-  port = "443"
+  username = ""
+  password = ""
+  serverip = ""
+  port = ""
 }
 
 resource "arrcusmcn_tenant" "tenant" {
-  name = "coke1"
-  organization = "coke1"
-  domain = "coke1.com"
-  defaultuser_name = "coke1 coke1"
-  defaultuser_username = "admin@coke1.com"
-  defaultuser_password = "coke123"
-  defaultuser_email = "coke1@coke1.com"
+  name = ""
+  organization = ""
+  domain = ""
+  defaultuser_name = ""
+  defaultuser_username = ""
+  defaultuser_password = ""
+  defaultuser_email = ""
   defaultuser_roles = ["TenantAdmin", "TenantOperator"]
 }

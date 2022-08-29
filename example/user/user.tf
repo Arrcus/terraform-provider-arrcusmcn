@@ -8,10 +8,10 @@ terraform {
 }
 
 provider "arrcusmcn" {
-  username = "admin@coke1.com"
-  password = "coke123"
-  serverip = "172.16.102.113"
-  port = "443"
+  username = ""
+  password = ""
+  serverip = ""
+  port = ""
 }
 
 /*
@@ -24,10 +24,10 @@ If you want to update user without create it, please follow:
 */
 
 resource "arrcusmcn_user" "user" {
-  name = "coke1 coke2"
-  username = "coke@coke1.com"
-  password = "coke123"
-  email = "coke@coke1.com"
+  name = ""
+  username = ""
+  password = ""
+  email = ""
   roles = ["TenantOperator"]
 }
 
