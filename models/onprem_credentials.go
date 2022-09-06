@@ -19,6 +19,9 @@ import (
 // swagger:model onprem_credentials
 type OnpremCredentials struct {
 
+	// coordinates
+	Coordinates *Coordinates `json:"coordinates,omitempty"`
+
 	// data if name
 	DataIfName []string `json:"data_if_name"`
 
@@ -30,9 +33,15 @@ type OnpremCredentials struct {
 	// Min Length: 1
 	ServerIP string `json:"server_ip,omitempty"`
 
+	// site address
+	SiteAddress string `json:"site_address,omitempty"`
+
 	// ssh key
 	// Min Length: 1
 	SSHKey string `json:"ssh_key,omitempty"`
+
+	// use pvt ip
+	UsePvtIP *bool `json:"use_pvt_ip,omitempty"`
 
 	// user name
 	// Min Length: 1
@@ -42,6 +51,10 @@ type OnpremCredentials struct {
 // Validate validates this onprem credentials
 func (m *OnpremCredentials) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateCoordinates(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
@@ -62,6 +75,25 @@ func (m *OnpremCredentials) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OnpremCredentials) validateCoordinates(formats strfmt.Registry) error {
+	if swag.IsZero(m.Coordinates) { // not required
+		return nil
+	}
+
+	if m.Coordinates != nil {
+		if err := m.Coordinates.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("coordinates")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("coordinates")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -113,8 +145,33 @@ func (m *OnpremCredentials) validateUserName(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this onprem credentials based on context it is used
+// ContextValidate validate this onprem credentials based on the context it is used
 func (m *OnpremCredentials) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCoordinates(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OnpremCredentials) contextValidateCoordinates(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Coordinates != nil {
+		if err := m.Coordinates.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("coordinates")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("coordinates")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

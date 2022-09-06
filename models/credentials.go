@@ -40,6 +40,9 @@ type Credentials struct {
 	// Min Length: 1
 	Name *string `json:"name"`
 
+	// numdeployments
+	Numdeployments int64 `json:"numdeployments"`
+
 	// provider
 	// Required: true
 	Provider *Providers `json:"provider"`
@@ -115,6 +118,8 @@ func (m *Credentials) validateProvider(formats strfmt.Registry) error {
 		if err := m.Provider.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("provider")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("provider")
 			}
 			return err
 		}
@@ -152,6 +157,8 @@ func (m *Credentials) contextValidateProvider(ctx context.Context, formats strfm
 		if err := m.Provider.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("provider")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("provider")
 			}
 			return err
 		}

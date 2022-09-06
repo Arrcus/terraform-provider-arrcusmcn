@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -25,25 +26,31 @@ type User struct {
 	Email *string `json:"email"`
 
 	// id
+	// Read Only: true
 	// Min Length: 1
-	ID string `json:"id,omitempty"`
+	// Format: ObjectId
+	ID strfmt.ObjectId `json:"id,omitempty" bson:"_id, omitempty"`
 
 	// is default
-	IsDefault bool `json:"is_default,omitempty"`
+	// Read Only: true
+	IsDefault *bool `json:"is_default"`
+
+	// is default password
+	// Read Only: true
+	IsDefaultPassword *bool `json:"is_default_password"`
 
 	// name
 	// Required: true
 	// Min Length: 1
 	Name *string `json:"name"`
 
-	// organization
-	// Min Length: 1
-	Organization string `json:"organization,omitempty"`
-
 	// password
 	// Required: true
-	// Min Length: 1
 	Password *string `json:"password"`
+
+	// roles
+	// Required: true
+	Roles []Rolename `json:"roles"`
 
 	// username
 	// Required: true
@@ -67,11 +74,11 @@ func (m *User) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateOrganization(formats); err != nil {
+	if err := m.validatePassword(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validatePassword(formats); err != nil {
+	if err := m.validateRoles(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -103,7 +110,11 @@ func (m *User) validateID(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinLength("id", "body", m.ID, 1); err != nil {
+	if err := validate.MinLength("id", "body", m.ID.String(), 1); err != nil {
+		return err
+	}
+
+	if err := validate.FormatOf("id", "body", "ObjectId", m.ID.String(), formats); err != nil {
 		return err
 	}
 
@@ -123,26 +134,32 @@ func (m *User) validateName(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *User) validateOrganization(formats strfmt.Registry) error {
-	if swag.IsZero(m.Organization) { // not required
-		return nil
-	}
-
-	if err := validate.MinLength("organization", "body", m.Organization, 1); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *User) validatePassword(formats strfmt.Registry) error {
 
 	if err := validate.Required("password", "body", m.Password); err != nil {
 		return err
 	}
 
-	if err := validate.MinLength("password", "body", *m.Password, 1); err != nil {
+	return nil
+}
+
+func (m *User) validateRoles(formats strfmt.Registry) error {
+
+	if err := validate.Required("roles", "body", m.Roles); err != nil {
 		return err
+	}
+
+	for i := 0; i < len(m.Roles); i++ {
+
+		if err := m.Roles[i].Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("roles" + "." + strconv.Itoa(i))
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("roles" + "." + strconv.Itoa(i))
+			}
+			return err
+		}
+
 	}
 
 	return nil
@@ -161,8 +178,74 @@ func (m *User) validateUsername(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this user based on context it is used
+// ContextValidate validate this user based on the context it is used
 func (m *User) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateID(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateIsDefault(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateIsDefaultPassword(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRoles(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *User) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "id", "body", strfmt.ObjectId(m.ID)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *User) contextValidateIsDefault(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "is_default", "body", m.IsDefault); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *User) contextValidateIsDefaultPassword(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "is_default_password", "body", m.IsDefaultPassword); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *User) contextValidateRoles(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Roles); i++ {
+
+		if err := m.Roles[i].ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("roles" + "." + strconv.Itoa(i))
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("roles" + "." + strconv.Itoa(i))
+			}
+			return err
+		}
+
+	}
+
 	return nil
 }
 

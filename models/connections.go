@@ -73,6 +73,8 @@ func (m *Connections) validateDeployment1(formats strfmt.Registry) error {
 		if err := m.Deployment1.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("deployment1")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("deployment1")
 			}
 			return err
 		}
@@ -91,6 +93,8 @@ func (m *Connections) validateDeployment2(formats strfmt.Registry) error {
 		if err := m.Deployment2.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("deployment2")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("deployment2")
 			}
 			return err
 		}
@@ -148,6 +152,8 @@ func (m *Connections) contextValidateDeployment1(ctx context.Context, formats st
 		if err := m.Deployment1.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("deployment1")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("deployment1")
 			}
 			return err
 		}
@@ -162,6 +168,8 @@ func (m *Connections) contextValidateDeployment2(ctx context.Context, formats st
 		if err := m.Deployment2.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("deployment2")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("deployment2")
 			}
 			return err
 		}

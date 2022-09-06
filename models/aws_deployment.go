@@ -19,8 +19,9 @@ import (
 // swagger:model aws_deployment
 type AwsDeployment struct {
 
-	// coordinates
-	Coordinates *Coordinates `json:"coordinates,omitempty"`
+	// byoip
+	// Min Length: 1
+	Byoip string `json:"byoip,omitempty"`
 
 	// instance key
 	// Min Length: 1
@@ -33,6 +34,10 @@ type AwsDeployment struct {
 	// private subnet
 	// Min Length: 1
 	PrivateSubnet string `json:"private_subnet,omitempty"`
+
+	// private subnet route table
+	// Min Length: 1
+	PrivateSubnetRouteTable string `json:"private_subnet_route_table,omitempty"`
 
 	// public subnet
 	// Min Length: 1
@@ -51,7 +56,7 @@ type AwsDeployment struct {
 func (m *AwsDeployment) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateCoordinates(formats); err != nil {
+	if err := m.validateByoip(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -64,6 +69,10 @@ func (m *AwsDeployment) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validatePrivateSubnet(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePrivateSubnetRouteTable(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -85,18 +94,13 @@ func (m *AwsDeployment) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *AwsDeployment) validateCoordinates(formats strfmt.Registry) error {
-	if swag.IsZero(m.Coordinates) { // not required
+func (m *AwsDeployment) validateByoip(formats strfmt.Registry) error {
+	if swag.IsZero(m.Byoip) { // not required
 		return nil
 	}
 
-	if m.Coordinates != nil {
-		if err := m.Coordinates.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("coordinates")
-			}
-			return err
-		}
+	if err := validate.MinLength("byoip", "body", m.Byoip, 1); err != nil {
+		return err
 	}
 
 	return nil
@@ -132,6 +136,18 @@ func (m *AwsDeployment) validatePrivateSubnet(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinLength("private_subnet", "body", m.PrivateSubnet, 1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *AwsDeployment) validatePrivateSubnetRouteTable(formats strfmt.Registry) error {
+	if swag.IsZero(m.PrivateSubnetRouteTable) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("private_subnet_route_table", "body", m.PrivateSubnetRouteTable, 1); err != nil {
 		return err
 	}
 
@@ -174,31 +190,8 @@ func (m *AwsDeployment) validateVpcID(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this aws deployment based on the context it is used
+// ContextValidate validates this aws deployment based on context it is used
 func (m *AwsDeployment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateCoordinates(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *AwsDeployment) contextValidateCoordinates(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Coordinates != nil {
-		if err := m.Coordinates.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("coordinates")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 

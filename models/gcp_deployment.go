@@ -23,8 +23,9 @@ type GcpDeployment struct {
 	// Min Length: 1
 	ArcOrchIP string `json:"arc_orch_ip,omitempty"`
 
-	// coordinates
-	Coordinates *Coordinates `json:"coordinates,omitempty"`
+	// byoip
+	// Min Length: 1
+	Byoip string `json:"byoip,omitempty"`
 
 	// credentials id
 	// Min Length: 1
@@ -70,7 +71,7 @@ func (m *GcpDeployment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateCoordinates(formats); err != nil {
+	if err := m.validateByoip(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -128,18 +129,13 @@ func (m *GcpDeployment) validateArcOrchIP(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *GcpDeployment) validateCoordinates(formats strfmt.Registry) error {
-	if swag.IsZero(m.Coordinates) { // not required
+func (m *GcpDeployment) validateByoip(formats strfmt.Registry) error {
+	if swag.IsZero(m.Byoip) { // not required
 		return nil
 	}
 
-	if m.Coordinates != nil {
-		if err := m.Coordinates.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("coordinates")
-			}
-			return err
-		}
+	if err := validate.MinLength("byoip", "body", m.Byoip, 1); err != nil {
+		return err
 	}
 
 	return nil
@@ -166,6 +162,8 @@ func (m *GcpDeployment) validateInstanceKey(formats strfmt.Registry) error {
 		if err := m.InstanceKey.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("instance_key")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("instance_key")
 			}
 			return err
 		}
@@ -262,10 +260,6 @@ func (m *GcpDeployment) validateZone(formats strfmt.Registry) error {
 func (m *GcpDeployment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateCoordinates(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateInstanceKey(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -276,26 +270,14 @@ func (m *GcpDeployment) ContextValidate(ctx context.Context, formats strfmt.Regi
 	return nil
 }
 
-func (m *GcpDeployment) contextValidateCoordinates(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Coordinates != nil {
-		if err := m.Coordinates.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("coordinates")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m *GcpDeployment) contextValidateInstanceKey(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.InstanceKey != nil {
 		if err := m.InstanceKey.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("instance_key")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("instance_key")
 			}
 			return err
 		}

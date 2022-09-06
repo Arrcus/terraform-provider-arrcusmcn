@@ -120,7 +120,8 @@ func DataSourceAwsDeployment() *schema.Resource {
 func dataAwsDeploymentRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	accessToken := m.(map[string]string)["access_token"]
-	url := m.(map[string]string)["baseUrl"] + "deployments"
+	tenant := m.(map[string]string)["tenant"]
+	url := m.(map[string]string)["baseUrl"] + "deployments" + "?tenant=" + tenant
 	res, err := utils.GetRequest(url, accessToken)
 	if err != nil {
 		return diag.FromErr(err)

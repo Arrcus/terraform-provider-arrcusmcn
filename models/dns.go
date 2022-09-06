@@ -19,6 +19,9 @@ import (
 // swagger:model dns
 type DNS struct {
 
+	// credential id
+	CredentialID string `json:"credential_id,omitempty"`
+
 	// domainname
 	// Required: true
 	// Min Length: 1

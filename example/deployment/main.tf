@@ -8,10 +8,10 @@ terraform {
 }
 
 provider "arrcusmcn" {
-  username = "admin"
-  password = "password"
-  serverip = "1.2.3.4"
-  port = "8000"
+  username = ""
+  password = ""
+  serverip = ""
+  port = ""
 }
 
 data "arrcusmcn_aws_cred" "aws_cred" {
@@ -19,13 +19,13 @@ data "arrcusmcn_aws_cred" "aws_cred" {
 }
 
 resource "arrcusmcn_aws_deployment" "arrcusmcn_aws" {
-  name = "aws_hub"
+  name = ""
   credentials_id = data.arrcusmcn_aws_cred.aws_cred.id
-  public_subnet = "aws-subnet"
-  region = "us-east-1"
-  vpc_id = "aws-vpc"
-  instance_key = "arcedge"
-  instance_type = "t2.medium"
+  public_subnet = ""
+  region = ""
+  vpc_id = ""
+  instance_key = ""
+  instance_type = ""
   private_subnet = ""
   enable_high_availability = false
   enable_private_subnet = false

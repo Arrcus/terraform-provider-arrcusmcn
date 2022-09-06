@@ -2,12 +2,11 @@ TEST?=$$(go list ./... | grep -v 'vendor')
 HOSTNAME=arrcus.com
 NAMESPACE=arrcus
 NAME=arrcusmcn
-BINARY=terraform-provider-${NAME}
 VERSION=1.0.0
-OS_ARCH=darwin_amd64
+OS_ARCH=darwin_arm64
 OS=$(shell go env GOOS)
 ARCH=$(shell go env GOARCH)
-
+BINARY=terraform-provider-${NAME}
 default: install
 
 build:

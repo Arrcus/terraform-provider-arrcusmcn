@@ -20,8 +20,12 @@ import (
 type ComponentTypes string
 
 func NewComponentTypes(value ComponentTypes) *ComponentTypes {
-	v := value
-	return &v
+	return &value
+}
+
+// Pointer returns a pointer to a freshly-allocated ComponentTypes.
+func (m ComponentTypes) Pointer() *ComponentTypes {
+	return &m
 }
 
 const (

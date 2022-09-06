@@ -23,6 +23,10 @@ type OnpremDeployment struct {
 	// Min Length: 1
 	BaseImage string `json:"base_image,omitempty"`
 
+	// default gw
+	// Min Length: 1
+	DefaultGw string `json:"default_gw,omitempty"`
+
 	// prefix
 	Prefix string `json:"prefix,omitempty"`
 
@@ -36,6 +40,13 @@ type OnpremDeployment struct {
 
 	// ssh psw
 	SSHPsw string `json:"ssh_psw,omitempty"`
+
+	// subnet mask
+	SubnetMask int64 `json:"subnet_mask,omitempty"`
+
+	// use pvt ip
+	// Read Only: true
+	UsePvtIP *bool `json:"use_pvt_ip,omitempty"`
 
 	// vcpus
 	Vcpus int64 `json:"vcpus,omitempty"`
@@ -55,6 +66,10 @@ func (m *OnpremDeployment) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateBaseImage(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDefaultGw(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -78,6 +93,18 @@ func (m *OnpremDeployment) validateBaseImage(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinLength("base_image", "body", m.BaseImage, 1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *OnpremDeployment) validateDefaultGw(formats strfmt.Registry) error {
+	if swag.IsZero(m.DefaultGw) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("default_gw", "body", m.DefaultGw, 1); err != nil {
 		return err
 	}
 
@@ -108,8 +135,26 @@ func (m *OnpremDeployment) validatePublicIP(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this onprem deployment based on context it is used
+// ContextValidate validate this onprem deployment based on the context it is used
 func (m *OnpremDeployment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateUsePvtIP(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OnpremDeployment) contextValidateUsePvtIP(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "use_pvt_ip", "body", m.UsePvtIP); err != nil {
+		return err
+	}
+
 	return nil
 }
 
